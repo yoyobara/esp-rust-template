@@ -20,7 +20,8 @@ esp_bootloader_esp_idf::esp_app_desc!();
 
 #[esp_rtos::main]
 async fn main(spawner: Spawner) {
-    let board = board::init();
+    let board = board::init().await;
 
     spawner.spawn(tasks::blink(board.led).unwrap());
+    spawner.spawn(tasks::show_text(board.oled).unwrap());
 }
