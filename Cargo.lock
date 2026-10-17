@@ -823,6 +823,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "esp-rust-template"
+version = "0.1.0"
+dependencies = [
+ "critical-section",
+ "embassy-executor",
+ "embassy-time",
+ "esp-backtrace",
+ "esp-bootloader-esp-idf",
+ "esp-hal",
+ "esp-println",
+ "esp-rtos",
+ "log",
+ "static_cell",
+]
+
+[[package]]
 name = "esp-storage"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -951,22 +967,6 @@ checksum = "d8b4f101d37c233fe88b2b5e6d27fedab934a52f804e34f52b4b9d4d5ba2ea63"
 dependencies = [
  "critical-section",
  "vcell",
-]
-
-[[package]]
-name = "example-project"
-version = "0.1.0"
-dependencies = [
- "critical-section",
- "embassy-executor",
- "embassy-time",
- "esp-backtrace",
- "esp-bootloader-esp-idf",
- "esp-hal",
- "esp-println",
- "esp-rtos",
- "log",
- "static_cell",
 ]
 
 [[package]]

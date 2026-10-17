@@ -1,11 +1,11 @@
 [package]
 edition      = "2024"
-name         = "example-project"
+name         = "esp-rust-template"
 rust-version = "1.95"
 version      = "0.1.0"
 
 [[bin]]
-name  = "example-project"
+name  = "esp-rust-template"
 path  = "src/main.rs"
 test  = false
 bench = false
