@@ -10,18 +10,23 @@
 // generator version: 1.4.0
 // generator parameters: -o esp32s3 -o unstable-hal -o embassy -o log -o esp-backtrace --toolchain esp
 
-mod board;
-mod tasks;
-
-use embassy_executor::Spawner;
 use esp_backtrace as _;
+use esp_hal::{clock::CpuClock, peripherals::Peripherals};
+use log::info;
 
 esp_bootloader_esp_idf::esp_app_desc!();
 
-#[esp_rtos::main]
-async fn main(spawner: Spawner) {
-    let board = board::init().await;
+fn init() -> Peripherals {
+    esp_println::logger::init_logger_from_env();
 
-    spawner.spawn(tasks::blink(board.led).unwrap());
-    spawner.spawn(tasks::show_text(board.oled).unwrap());
+    let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
+    let p = esp_hal::init(config);
+
+    info!("Embassy initialized!");
+
+    p
+}
+
+fn main() {
+    init();
 }
