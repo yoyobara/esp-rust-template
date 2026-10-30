@@ -11,7 +11,12 @@
 // generator parameters: -o esp32s3 -o unstable-hal -o embassy -o log -o esp-backtrace --toolchain esp
 
 use esp_backtrace as _;
-use esp_hal::{clock::CpuClock, peripherals::Peripherals};
+use esp_hal::{
+    clock::CpuClock,
+    delay::Delay,
+    gpio::{Level, Output, OutputConfig},
+    peripherals::Peripherals,
+};
 use log::info;
 
 esp_bootloader_esp_idf::esp_app_desc!();
@@ -27,6 +32,17 @@ fn init() -> Peripherals {
     p
 }
 
-fn main() {
-    init();
+#[esp_hal::main]
+fn main() -> ! {
+    let p = init();
+    let mut led1 = Output::new(p.GPIO45, Level::High, OutputConfig::default());
+    let mut led2 = Output::new(p.GPIO46, Level::Low, OutputConfig::default());
+    let delay = Delay::new();
+
+    loop {
+        led1.toggle();
+        led2.toggle();
+
+        delay.delay_millis(500);
+    }
 }
