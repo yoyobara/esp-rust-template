@@ -7,17 +7,32 @@
 )]
 #![deny(clippy::large_stack_frames)]
 
-// generator version: 1.4.0
-// generator parameters: -o esp32s3 -o unstable-hal -o embassy -o log -o esp-backtrace --toolchain esp
+mod screen;
 
+use embedded_graphics::{
+    Drawable as _,
+    draw_target::DrawTarget as _,
+    geometry::Point,
+    mono_font::{MonoTextStyle, ascii::FONT_10X20},
+    pixelcolor::{Rgb565, RgbColor as _},
+    text::{Baseline, Text},
+};
+use embedded_hal_bus::spi::ExclusiveDevice;
 use esp_backtrace as _;
 use esp_hal::{
     clock::CpuClock,
     delay::Delay,
     gpio::{Level, Output, OutputConfig},
     peripherals::Peripherals,
+    spi::{
+        Mode,
+        master::{Config, Spi},
+    },
+    time::Rate,
 };
 use log::info;
+
+use crate::screen::Screen;
 
 esp_bootloader_esp_idf::esp_app_desc!();
 
@@ -35,14 +50,38 @@ fn init() -> Peripherals {
 #[esp_hal::main]
 fn main() -> ! {
     let p = init();
-    let mut led1 = Output::new(p.GPIO45, Level::High, OutputConfig::default());
-    let mut led2 = Output::new(p.GPIO46, Level::Low, OutputConfig::default());
-    let delay = Delay::new();
+    let mut delay = Delay::new();
 
-    loop {
-        led1.toggle();
-        led2.toggle();
+    let spi = Spi::new(
+        p.SPI2,
+        Config::default()
+            .with_frequency(Rate::from_mhz(40))
+            .with_mode(Mode::_0),
+    )
+    .unwrap()
+    .with_sck(p.GPIO40)
+    .with_mosi(p.GPIO41);
 
-        delay.delay_millis(500);
-    }
+    let cs = Output::new(p.GPIO42, Level::High, OutputConfig::default());
+    let dc = Output::new(p.GPIO47, Level::Low, OutputConfig::default());
+    let rst = Output::new(p.GPIO48, Level::Low, OutputConfig::default());
+    let mut bl = Output::new(p.GPIO33, Level::Low, OutputConfig::default()); // backlight
+
+    let spi_device = ExclusiveDevice::new(spi, cs, delay).unwrap();
+    let mut buffer = [0u8; 512];
+    let mut screen = Screen::init(spi_device, dc, rst, &mut buffer, &mut delay).unwrap();
+
+    screen.clear(Rgb565::BLACK).unwrap();
+    Text::with_baseline(
+        "nigga what",
+        Point::new(0, 0),
+        MonoTextStyle::new(&FONT_10X20, Rgb565::WHITE),
+        Baseline::Top,
+    )
+    .draw(&mut screen)
+    .unwrap();
+
+    bl.set_high();
+
+    loop {}
 }

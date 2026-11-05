@@ -21,6 +21,10 @@ esp-backtrace = { version = "0.20.0", features = [
 ] }
 esp-println = { version = "0.18.0", features = ["esp32s3", "log-04"] }
 heapless = "0.9.3"
+embedded-hal = "1.0.0"
+mipidsi = "0.10.0"
+embedded-hal-bus = "0.3.0"
+embedded-graphics = "0.8.2"
 
 
 # For fine tuning these settings, please refer to https://doc.rust-lang.org/cargo/reference/profiles.html
